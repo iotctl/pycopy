@@ -1,0 +1,8 @@
+menuconfig PYCOPY
+    bool "Pycopy integration"
+    help
+        This option enables Zephyr Pycopy integration
+
+config PYCOPY_OPT1
+    string "Dummy option 1"
+    depends on PYCOPY

@@ -2,25 +2,6 @@ set(PYCOPY_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated)
 set(PYCOPY_GENHDR_DIR ${PYCOPY_GENERATED_DIR}/genhdr)
 set(PYCOPY_QSTR_H ${PYCOPY_GENHDR_DIR}/qstrdefs.generated.h)
 
-
-# add_library(pycopy INTERFACE)
-
-# target_include_directories(pycopy INTERFACE 
-# 	ports/zephyr
-# 	$<TARGET_PROPERTY:zephyr_interface,INTERFACE_INCLUDE_DIRECTORIES>	
-# )
-
-# target_compile_definitions(pycopy INTERFACE
-# 	$<TARGET_PROPERTY:zephyr_interface,INTERFACE_COMPILE_DEFINITIONS>	
-# 
-
-# # file(GENERATE OUTPUT filename CONTENT "$<TARGET_PROPERTY:zephyr_interface,INTERFACE_COMPILE_OPTIONS>")
-
-# target_compile_options(pycopy INTERFACE
-# 	$<TARGET_PROPERTY:zephyr_interface,INTERFACE_COMPILE_OPTIONS>	
-# )
-# zephyr_interface_library_named(pycopy)
-
 zephyr_library_named(pycopy)
 
 zephyr_include_directories(
@@ -29,7 +10,6 @@ zephyr_include_directories(
 	${PYCOPY_GENERATED_DIR}
 )
 
-#target_sources(pycopy INTERFACE
 zephyr_library_sources(
     py/argcheck.c
 	py/asmarm.c
@@ -168,50 +148,12 @@ zephyr_library_sources(
 	ports/zephyr/modusocket.c
 	ports/zephyr/moduos.c
 	ports/zephyr/modutime.c
-#ports/zephyr/vfs_zephyr.c
 )
-
-# get_property(flags TARGET pycopy PROPERTY INTERFACE_LINK_LIBRARIES)
-# message("XXX: ${flags}")
-
-# get_property(flags TARGET zephyr_interface PROPERTY INTERFACE_LINK_LIBRARIES)
-# message("XXX: ${flags}")
-
-# get_property(xxx TARGET pycopy PROPERTY COMPILE_DEFINITIONS)
-# message("AAA: ${xxx}")
-
-# get_property(flags TARGET pycopy PROPERTY COMPILE_OPTIONS)
-# message("BBB: ${xxx}")
 
 get_property(ZEPHYR_INTERFACE_OPTIONS TARGET zephyr_interface PROPERTY INTERFACE_COMPILE_OPTIONS)
 process_flags(C ZEPHYR_INTERFACE_OPTIONS PYCOPY_OPTIONS)
 
-# get_property(PYCOPY_OPTIONS TARGET zephyr_interface PROPERTY INTERFACE_COMPILE_OPTIONS)
-
-# get_property(flags2 TARGET zephyr_interface PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
-# message("XXX2: ${flags2}")
-
-# message("XXX3: ")
-# zephyr_library_named(pycopy)
-# zephyr_include_directories($<TARGET_PROPERTY:pycopy,INTERFACE_INCLUDE_DIRECTORIES>)
-# zephyr_include_directories(${PYCOPY_GENERATED_DIR})
-# # target_include_directories(pycopy PRIVATE ports/zephyr)
-# zephyr_library_sources($<TARGET_PROPERTY:pycopy,INTERFACE_SOURCES>)
-
-# zephyr_library_sources(
-
-# Basic idea is to have 2 targets
-#
-# pycopy-qstr - used to generate QSTRs, other modules can update its sources and includes as well as flags and definitions
-# and still have ability to compile themselves as independent libraries without saturation of pycopy target
-#
-# pycopy is dependent on pycopy-qstr
-#
-
-# TODO pkral:
-# pycopy-qstr must include all includes and sources as pycopy, this is copy-paste workaround
-# so maybe we can define "base" interface for both "pycopy" and "pycopy-qstr" ?
-
+# pycopy-qstr - used to generate QSTRs
 
 add_custom_command(
 	OUTPUT ${PYCOPY_QSTR_H}
