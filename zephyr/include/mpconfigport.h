@@ -1,8 +1,8 @@
-
 #include <alloca.h>
 
 // Included here to get basic Zephyr environment (macros, etc.)
 #include <zephyr.h>
+#include "util.h"
 
 // Usually passed from Makefile
 #ifndef MICROPY_HEAP_SIZE
@@ -50,7 +50,7 @@
 #define MICROPY_PY_UTIME            (1)
 #define MICROPY_PY_UTIME_MP_HAL     (1)
 #define MICROPY_PY_ZEPHYR           (1)
-#define MICROPY_PY_ZSENSOR          (1)
+#define MICROPY_PY_ZSENSOR          (0)
 #define MICROPY_PY_SYS_MODULES      (0)
 #define MICROPY_LONGINT_IMPL (MICROPY_LONGINT_IMPL_LONGLONG)
 #define MICROPY_FLOAT_IMPL (MICROPY_FLOAT_IMPL_FLOAT)
