@@ -138,7 +138,8 @@ zephyr_library_sources(
 	extmod/vfs.c
 	extmod/vfs_reader.c
 	# zephyr
-#ports/zephyr/main.c
+	ports/zephyr/main.c
+	ports/zephyr/src/zephyr_getchar.c
 	ports/zephyr/uart_core.c
 	ports/zephyr/help.c
 	ports/zephyr/modmachine.c
