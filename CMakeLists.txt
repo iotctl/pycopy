@@ -172,5 +172,17 @@ add_custom_command(
 
 add_custom_target(pycopy-qstr-gen DEPENDS ${PYCOPY_QSTR_H})
 add_dependencies(pycopy-qstr-gen ${SYSCALL_LIST_H_TARGET} ${KOBJ_TYPES_H_TARGET})
+
+add_custom_command(
+	OUTPUT ${PYCOPY_GENERATED_DIR}/frozen.c
+	COMMAND ${CMAKE_CURRENT_LIST_DIR}/tools/make-frozen.py > ${PYCOPY_GENERATED_DIR}/frozen.c
+	COMMENT "Generating frozen.c"
+	VERBATIM
+)
+
 add_dependencies(pycopy pycopy-qstr-gen)
+
+add_library(pycopy-frozen OBJECT ${PYCOPY_GENERATED_DIR}/frozen.c)
+target_link_libraries(pycopy PUBLIC pycopy-frozen)
+
 
