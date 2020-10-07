@@ -6,7 +6,7 @@ zephyr_library_named(pycopy)
 
 zephyr_include_directories(
 	.
-	ports/zephyr
+	zephyr/include
 	${PYCOPY_GENERATED_DIR}
 )
 
@@ -128,6 +128,7 @@ zephyr_library_sources(
 	lib/utils/pyexec.c
 	lib/utils/stdout_helpers.c
 	lib/utils/interrupt_char.c
+	lib/utils/mpirq.c
 	lib/mp-readline/readline.c
 	extmod/modubinascii.c
 	extmod/moduhashlib.c
@@ -137,7 +138,7 @@ zephyr_library_sources(
 	extmod/virtpin.c
 	extmod/vfs.c
 	extmod/vfs_reader.c
-	# zephyr
+	# zephyr official port
 	ports/zephyr/main.c
 	ports/zephyr/src/zephyr_getchar.c
 	ports/zephyr/uart_core.c
@@ -149,6 +150,8 @@ zephyr_library_sources(
 	ports/zephyr/modusocket.c
 	ports/zephyr/moduos.c
 	ports/zephyr/modutime.c
+	ports/zephyr/zephyr_storage.c
+	# zephyr new port
 )
 
 get_property(ZEPHYR_INTERFACE_OPTIONS TARGET zephyr_interface PROPERTY INTERFACE_COMPILE_OPTIONS)
