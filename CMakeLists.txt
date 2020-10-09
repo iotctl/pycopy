@@ -154,6 +154,7 @@ zephyr_library_sources(
 	# zephyr new port
 	zephyr/src/util.c
 	zephyr/src/python.c
+	zephyr/include/mpconfigport.h
 )
 
 get_property(ZEPHYR_INTERFACE_OPTIONS TARGET zephyr_interface PROPERTY INTERFACE_COMPILE_OPTIONS)
@@ -171,7 +172,7 @@ add_custom_command(
 	--sources \"$<TARGET_PROPERTY:pycopy,SOURCES>\"
 	--outdir ${PYCOPY_GENHDR_DIR}
 	COMMENT "Generating QSTRs"
-	DEPENDS $<TARGET_PROPERTY:pycopy,INTERFACE_SOURCES>
+	DEPENDS $<TARGET_PROPERTY:pycopy,SOURCES>
 	VERBATIM
 )
 
