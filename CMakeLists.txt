@@ -154,6 +154,7 @@ zephyr_library_sources(
 	# zephyr new port
 	zephyr/src/util.c
 	zephyr/src/python.c
+	zephyr/src/modtest.c
 	zephyr/include/mpconfigport.h
 )
 
