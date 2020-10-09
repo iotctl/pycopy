@@ -6,8 +6,8 @@ zephyr_library_named(pycopy)
 
 zephyr_include_directories(
 	.
-	ports/zephyr
 	zephyr/include
+	ports/zephyr
 	${PYCOPY_GENERATED_DIR}
 )
 
@@ -188,6 +188,7 @@ add_custom_command(
 add_dependencies(pycopy pycopy-qstr-gen)
 
 add_library(pycopy-frozen OBJECT ${PYCOPY_GENERATED_DIR}/frozen.c)
+add_dependencies(pycopy-frozen pycopy-qstr-gen)
 target_link_libraries(pycopy PUBLIC pycopy-frozen)
 
 
