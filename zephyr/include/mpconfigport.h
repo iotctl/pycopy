@@ -2,7 +2,6 @@
 
 // Included here to get basic Zephyr environment (macros, etc.)
 #include <zephyr.h>
-#include "util.h"
 
 // Usually passed from Makefile
 #ifndef MICROPY_HEAP_SIZE

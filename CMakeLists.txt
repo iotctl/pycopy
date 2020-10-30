@@ -152,7 +152,6 @@ zephyr_library_sources(
 	ports/zephyr/modutime.c
 	ports/zephyr/zephyr_storage.c
 	# zephyr new port
-	zephyr/src/util.c
 	zephyr/src/python.c
 	zephyr/include/mpconfigport.h
 	zephyr/src/zfs.c
