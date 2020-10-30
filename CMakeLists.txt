@@ -155,6 +155,8 @@ zephyr_library_sources(
 	zephyr/src/util.c
 	zephyr/src/python.c
 	zephyr/include/mpconfigport.h
+	zephyr/src/zfs.c
+	zephyr/src/zfs_file.c
 )
 
 get_property(ZEPHYR_INTERFACE_OPTIONS TARGET zephyr_interface PROPERTY INTERFACE_COMPILE_OPTIONS)
