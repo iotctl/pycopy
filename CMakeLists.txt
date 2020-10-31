@@ -1,3 +1,5 @@
+if(CONFIG_PYCOPY)
+
 set(PYCOPY_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated)
 set(PYCOPY_GENHDR_DIR ${PYCOPY_GENERATED_DIR}/genhdr)
 set(PYCOPY_QSTR_H ${PYCOPY_GENHDR_DIR}/qstrdefs.generated.h)
@@ -194,4 +196,4 @@ add_library(pycopy-frozen OBJECT ${PYCOPY_GENERATED_DIR}/frozen.c)
 add_dependencies(pycopy-frozen pycopy-qstr-gen)
 target_link_libraries(pycopy PUBLIC pycopy-frozen)
 
-
+endif()
