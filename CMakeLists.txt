@@ -193,6 +193,10 @@ add_custom_command(
 add_dependencies(pycopy pycopy-qstr-gen)
 
 add_library(pycopy-frozen OBJECT ${PYCOPY_GENERATED_DIR}/frozen.c)
+# TODO missing -include before zephyr_stdint.h
+#target_compile_options(pycopy-frozen PRIVATE ${PYCOPY_OPTIONS})
+target_compile_options(pycopy-frozen PRIVATE -m32)
+
 add_dependencies(pycopy-frozen pycopy-qstr-gen)
 target_link_libraries(pycopy PUBLIC pycopy-frozen)
 
