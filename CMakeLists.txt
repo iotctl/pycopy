@@ -136,26 +136,20 @@ zephyr_library_sources(
 	extmod/modubinascii.c
 	extmod/moduhashlib.c
 	extmod/utime_mphal.c
-	extmod/machine_signal.c
-	extmod/machine_i2c.c
 	extmod/virtpin.c
 	extmod/vfs.c
 	extmod/vfs_reader.c
+
 	# zephyr official port
-	ports/zephyr/src/zephyr_getchar.c
-	ports/zephyr/uart_core.c
 	ports/zephyr/help.c
 	ports/zephyr/modmachine.c
-	ports/zephyr/machine_pin.c
-	ports/zephyr/machine_i2c.c
-	ports/zephyr/modzephyr.c
 	ports/zephyr/modusocket.c
 	ports/zephyr/moduos.c
 	ports/zephyr/modutime.c
 	ports/zephyr/zephyr_storage.c
+
 	# zephyr new port
 	zephyr/src/python.c
-	zephyr/include/mpconfigport.h
 	zephyr/src/zfs.c
 	zephyr/src/zfs_file.c
 	zephyr/src/modzephyr.c

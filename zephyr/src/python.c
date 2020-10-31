@@ -3,121 +3,62 @@
 #include <string.h>
 
 #include <zephyr.h>
-#ifdef CONFIG_NETWORKING
-#include <net/net_context.h>
-#endif
-
-#ifdef CONFIG_USB
-#include <usb/usb_device.h>
-#endif
-
+#include <kernel.h>
+#include <console/console.h>
 #include <storage/flash_map.h>
+#include <logging/log.h>
 
-#include "py/mperrno.h"
-#include "py/compile.h"
-#include "py/runtime.h"
-#include "py/repl.h"
-#include "py/gc.h"
-#include "py/stackctrl.h"
-#include "lib/utils/pyexec.h"
-#include "lib/mp-readline/readline.h"
+#include <py/compile.h>
+#include <py/gc.h>
+#include <py/stackctrl.h>
+#include <lib/utils/pyexec.h>
 
 #if MICROPY_VFS
-#include "extmod/vfs.h"
+#include <zfs.h>
 #endif
 
-#include "modmachine.h"
-#include "modzephyr.h"
-
-#ifdef TEST
-#include "lib/upytesthelper/upytesthelper.h"
-#include "lib/tinytest/tinytest.c"
-#include "lib/upytesthelper/upytesthelper.c"
-#include TEST
-#endif
+LOG_MODULE_REGISTER(python, LOG_LEVEL_INF);
 
 static char heap[MICROPY_HEAP_SIZE];
 
-void init_zephyr(void) {
-    // We now rely on CONFIG_NET_APP_SETTINGS to set up bootstrap
-    // network addresses.
-    #if 0
-    #ifdef CONFIG_NETWORKING
-    if (net_if_get_default() == NULL) {
-        // If there's no default networking interface,
-        // there's nothing to configure.
-        return;
-    }
-    #endif
-    #ifdef CONFIG_NET_IPV4
-    static struct in_addr in4addr_my = {{{192, 0, 2, 1}}};
-    net_if_ipv4_addr_add(net_if_get_default(), &in4addr_my, NET_ADDR_MANUAL, 0);
-    static struct in_addr in4netmask_my = {{{255, 255, 255, 0}}};
-    net_if_ipv4_set_netmask(net_if_get_default(), &in4netmask_my);
-    static struct in_addr in4gw_my = {{{192, 0, 2, 2}}};
-    net_if_ipv4_set_gw(net_if_get_default(), &in4gw_my);
-    #endif
-    #ifdef CONFIG_NET_IPV6
-    // 2001:db8::1
-    static struct in6_addr in6addr_my = {{{0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}}};
-    net_if_ipv6_addr_add(net_if_get_default(), &in6addr_my, NET_ADDR_MANUAL, 0);
-    #endif
-    #endif
+extern struct fs_mount_t fs_nand_fat;
+
+// TODO create INIT macro
+static struct vfs_zephyr_mount vfs_root = {
+	.base = {
+		.type = &mp_zfs_type 
+    },
+	.mount = &fs_nand_fat,
+	.cwd = MP_OBJ_NEW_QSTR(MP_QSTR_)
+};
+
+// Receive single character
+int mp_hal_stdin_rx_chr(void) {
+    return console_getchar();
 }
 
-#if MICROPY_VFS
-STATIC void vfs_init(void) {
-    mp_obj_t bdev = NULL;
-    mp_obj_t mount_point;
-    const char *mount_point_str = NULL;
-    int ret = 0;
-
-    #ifdef CONFIG_DISK_ACCESS_SDHC
-    mp_obj_t args[] = { mp_obj_new_str(CONFIG_DISK_SDHC_VOLUME_NAME, strlen(CONFIG_DISK_SDHC_VOLUME_NAME)) };
-    bdev = zephyr_disk_access_type.make_new(&zephyr_disk_access_type, ARRAY_SIZE(args), 0, args);
-    mount_point_str = "/sd";
-    #elif defined(CONFIG_FLASH_MAP) && FLASH_AREA_LABEL_EXISTS(storage)
-    mp_obj_t args[] = { MP_OBJ_NEW_SMALL_INT(FLASH_AREA_ID(storage)), MP_OBJ_NEW_SMALL_INT(4096) };
-    bdev = zephyr_flash_area_type.make_new(&zephyr_flash_area_type, ARRAY_SIZE(args), 0, args);
-    mount_point_str = "/flash";
-    #endif
-
-    if ((bdev != NULL)) {
-        mount_point = mp_obj_new_str(mount_point_str, strlen(mount_point_str));
-        ret = mp_vfs_mount_and_chdir_protected(bdev, mount_point);
-        // TODO: if this failed, make a new file system and try to mount again
+// Send string of given length
+void mp_hal_stdout_tx_strn(const char *str, mp_uint_t len) {
+    while (len--) {
+        char c = *str++;
+        while (console_putchar(c) == -1) {
+            k_sleep(K_MSEC(1));
+        }
     }
 }
-#endif // MICROPY_VFS
 
-int real_main(void) {
+int DEBUG_printf(const char *fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    log_printk(fmt, ap);
+    va_end(ap);
+    return 0;
+}
+
+int python_init(void) {
     mp_stack_ctrl_init();
     // Make MicroPython's stack limit somewhat smaller than full stack available
     mp_stack_set_limit(CONFIG_MAIN_STACK_SIZE - 512);
-
-    init_zephyr();
-
-    #ifdef TEST
-    static const char *argv[] = {"test"};
-    upytest_set_heap(heap, heap + sizeof(heap));
-    int r = tinytest_main(1, argv, groups);
-    printf("status: %d\n", r);
-
-    #ifdef CONFIG_ARM
-    if (r == 0) {
-        __asm volatile ("ldr r1, =0x20026");
-        __asm volatile ("mov r0, #0x18");
-        __asm volatile ("bkpt #0xab");
-    } else {
-        __asm volatile ("ldr r1, =0");
-        __asm volatile ("mov r0, #0x18");
-        __asm volatile ("bkpt #0xab");
-    }
-    #else
-    exit(r);
-    #endif
-
-    #endif
 
 soft_reset:
     #if MICROPY_ENABLE_GC
@@ -128,17 +69,22 @@ soft_reset:
     mp_obj_list_append(mp_sys_path, MP_OBJ_NEW_QSTR(MP_QSTR_)); // current dir (or base dir of the script)
     mp_obj_list_init(mp_sys_argv, 0);
 
-    #ifdef CONFIG_USB
-    usb_enable(NULL);
-    #endif
-
     #if MICROPY_VFS
-    vfs_init();
+    int res = vfs_zephyr_root(&vfs_root);
+	if (!res) {
+        // TODO append search path according to root mount point
+        // append to search path /NAND:/ and /NAND:/lib
+		mp_obj_list_append(mp_sys_path, MP_OBJ_NEW_QSTR(MP_QSTR__slash_NAND_colon__slash_));
+		mp_obj_list_append(mp_sys_path, MP_OBJ_NEW_QSTR(MP_QSTR__slash_NAND_colon__slash_lib));
+	}
     #endif
 
     #if MICROPY_MODULE_FROZEN || MICROPY_VFS
+    pyexec_file_if_exists("boot.py");
     pyexec_file_if_exists("main.py");
     #endif
+
+    //MP_STATE_PORT(pyb_config_main) = MP_OBJ_NULL;
 
     for (;;) {
         if (pyexec_mode_kind == PYEXEC_MODE_RAW_REPL) {
@@ -152,7 +98,8 @@ soft_reset:
         }
     }
 
-    printf("soft reboot\n");
+    gc_sweep_all();
+    LOG_DBG("soft reboot");
 
     #if MICROPY_PY_MACHINE
     machine_pin_deinit();
@@ -179,27 +126,25 @@ mp_lexer_t *mp_lexer_new_from_file(const char *filename) {
 }
 #endif
 
-mp_import_stat_t mp_import_stat(const char *path) {
-    #if MICROPY_VFS
-    return mp_vfs_import_stat(path);
-    #else
-    return MP_IMPORT_STAT_NO_EXIST;
-    #endif
+// mp_import_stat_t mp_import_stat(const char *path) {
+//     #if MICROPY_VFS
+//     return mp_vfs_import_stat(path);
+//     #else
+//     return MP_IMPORT_STAT_NO_EXIST;
+//     #endif
+// }
+
+// mp_obj_t mp_builtin_open(size_t n_args, const mp_obj_t *args, mp_map_t *kwargs) {
+//     #if MICROPY_VFS
+//     return mp_vfs_open(n_args, args, kwargs);
+//     #else
+//     return mp_const_none;
+//     #endif
+// }
+// MP_DEFINE_CONST_FUN_OBJ_KW(mp_builtin_open_obj, 1, mp_builtin_open);
+
+FUNC_NORETURN void nlr_jump_fail(void *val) {
+    LOG_ERR("");
+    k_oops();
+    CODE_UNREACHABLE;
 }
-
-mp_obj_t mp_builtin_open(size_t n_args, const mp_obj_t *args, mp_map_t *kwargs) {
-    #if MICROPY_VFS
-    return mp_vfs_open(n_args, args, kwargs);
-    #else
-    return mp_const_none;
-    #endif
-}
-MP_DEFINE_CONST_FUN_OBJ_KW(mp_builtin_open_obj, 1, mp_builtin_open);
-
-NORETURN void nlr_jump_fail(void *val) {
-    while (1) {
-        ;
-    }
-}
-
-
