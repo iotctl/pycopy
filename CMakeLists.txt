@@ -3,7 +3,7 @@ if(CONFIG_PYCOPY)
 set(PYCOPY_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated)
 set(PYCOPY_GENHDR_DIR ${PYCOPY_GENERATED_DIR}/genhdr)
 set(PYCOPY_QSTR_H ${PYCOPY_GENHDR_DIR}/qstrdefs.generated.h)
-
+set(QSTR_DEFS zephyr/include/qstrdefsport.h)
 zephyr_library_named(pycopy)
 
 zephyr_include_directories(
@@ -168,6 +168,7 @@ add_custom_command(
 	--defs \"$<TARGET_PROPERTY:pycopy,COMPILE_DEFINITIONS>\"
 	--includes \"$<TARGET_PROPERTY:pycopy,INCLUDE_DIRECTORIES>\"
 	--sources \"$<TARGET_PROPERTY:pycopy,SOURCES>\"
+	--qstrdefs "${QSTR_DEFS}"
 	--outdir ${PYCOPY_GENHDR_DIR}
 	COMMENT "Generating QSTRs"
 	DEPENDS $<TARGET_PROPERTY:pycopy,SOURCES>

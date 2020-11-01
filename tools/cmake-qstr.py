@@ -62,6 +62,9 @@ def main():
                            help="Collection of include directories passed to build micropython sources")
     processor.add_argument("--verbose", dest='verbose',
                            help="Print processing information")
+    processor.add_argument("--qstrdefs", dest='qstrdefs',
+                           help="Collection of files with extra/port defined QSTRs"
+                           )
 
     generator = parser.add_argument_group("generator options")
     generator.add_argument("--outdir", default=BASEDIR,
@@ -80,6 +83,7 @@ def main():
         print(f"  outdir: {ARGS.outdir}")
         print(f"includes: {ARGS.includes}")
         print(f" sources: {ARGS.sources}")
+        print(f"qstrdefs: {ARGS.qstrdefs}")
         print()
 
     chdir(HOMEDIR)
@@ -110,7 +114,7 @@ def main():
     exec(f"python py/makeqstrdefs.py cat qstr {ARGS.outdir}/qstr.i.last {ARGS.outdir}/qstr {ARGS.outdir}/qstrdefs.collected.h")
 
     # step 4
-    exec(f'cat py/qstrdefs.h {ARGS.outdir}/qstrdefs.collected.h | '
+    exec(f'cat py/qstrdefs.h {ARGS.qstrdefs} {ARGS.outdir}/qstrdefs.collected.h | '
            f'sed \'s/^Q(.*)/"&"/\' | '
            f'{ARGS.compiler} -E {ARGS.defs} {ARGS.flags} {ARGS.includes} - | '
            f'sed \'s/^"\(Q(.*)\)"/\\1/\' > {ARGS.outdir}/qstrdefs.preprocessed.h')
