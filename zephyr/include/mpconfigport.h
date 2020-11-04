@@ -77,6 +77,7 @@
 #define MICROPY_READER_POSIX        (0) //
 #define MICROPY_READER_VFS          (MICROPY_VFS)
 #define MICROPY_REPL_AUTO_INDENT    (1)
+#define MICROPY_PY_USELECT          (1)
 
 // note these two options are actually independent as MICROPY_STACK_CHECK works 
 // on native thread stack where is python runtime executed and MICROPY_ENABLE_PYSTACK
@@ -171,3 +172,10 @@ extern const struct _mp_obj_module_t mp_module_zsensor;
 #define mp_builtin_open_obj mp_vfs_open_obj
 #define MICROPY_BEGIN_ATOMIC_SECTION irq_lock
 #define MICROPY_END_ATOMIC_SECTION irq_unlock
+
+#define MICROPY_EVENT_POLL_HOOK \
+    do { \
+        extern void mp_handle_pending(bool); \
+        mp_handle_pending(true); \
+        k_yield(); \
+    } while (0);
