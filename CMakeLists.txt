@@ -139,6 +139,7 @@ zephyr_library_sources(
 	extmod/virtpin.c
 	extmod/vfs.c
 	extmod/vfs_reader.c
+	extmod/moduheapq.c
 
 	# zephyr official port
 	ports/zephyr/help.c

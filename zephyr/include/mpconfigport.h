@@ -80,6 +80,7 @@
 #define MICROPY_STACK_CHECK         (1)
 #define MICROPY_USE_INTERNAL_PRINTF (0)
 #define MICROPY_VFS                 (1)
+#define MICROPY_PY_UHEAPQ           (1)
 
 #define MICROPY_HEAP_SIZE (16 * 1024)
 
