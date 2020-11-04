@@ -55,15 +55,16 @@
 #define MICROPY_PY_COLLECTIONS      (1) 
 #define MICROPY_PY___FILE__         (0) //
 #define MICROPY_PY_GC               (1) //
-#define MICROPY_PY_IO               (0)
+#define MICROPY_PY_IO               (1)
 #define MICROPY_PY_IO_FILEIO        (1) //
+#define MICROPY_PY_IO_BYTESIO       (1)
 #define MICROPY_PY_MACHINE          (0)
 #define MICROPY_PY_MACHINE_I2C      (0)
 #define MICROPY_PY_MACHINE_I2C_MAKE_NEW machine_hard_i2c_make_new
 #define MICROPY_PY_MACHINE_PIN_MAKE_NEW mp_pin_make_new
 #define MICROPY_PY_MATH             (0) //
 #define MICROPY_PY_MICROPYTHON_MEM_INFO (1)
-#define MICROPY_PY_STRUCT           (0)
+#define MICROPY_PY_STRUCT           (1)
 #define MICROPY_PY_SYS              (1)
 #define MICROPY_PY_SYS_MODULES      (0)
 #define MICROPY_PY_UBINASCII        (1)
@@ -166,6 +167,9 @@ extern const struct _mp_obj_module_t mp_module_zsensor;
 // extra built in names to add to the global namespace
 #define MICROPY_PORT_BUILTINS \
     { MP_ROM_QSTR(MP_QSTR_open), MP_ROM_PTR(&mp_builtin_open_obj) },
+
+#define mp_type_fileio mp_type_vfs_fat_fileio
+#define mp_type_textio mp_type_vfs_fat_textio
 
 #define mp_import_stat mp_vfs_import_stat
 #define mp_builtin_open mp_vfs_open
