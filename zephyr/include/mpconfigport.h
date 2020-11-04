@@ -77,7 +77,14 @@
 #define MICROPY_READER_POSIX        (0) //
 #define MICROPY_READER_VFS          (MICROPY_VFS)
 #define MICROPY_REPL_AUTO_INDENT    (1)
+
+// note these two options are actually independent as MICROPY_STACK_CHECK works 
+// on native thread stack where is python runtime executed and MICROPY_ENABLE_PYSTACK
+// allocates stack for python objects on separate memory region (without checking)
+
+#define MICROPY_ENABLE_PYSTACK      (0)
 #define MICROPY_STACK_CHECK         (1)
+
 #define MICROPY_USE_INTERNAL_PRINTF (0)
 #define MICROPY_VFS                 (1)
 #define MICROPY_PY_UHEAPQ           (1)
