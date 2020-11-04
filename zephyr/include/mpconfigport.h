@@ -91,7 +91,7 @@
 #define MICROPY_VFS                 (1)
 #define MICROPY_PY_UHEAPQ           (1)
 
-#define MICROPY_HEAP_SIZE (16 * 1024)
+#define MICROPY_HEAP_SIZE           (64 * 1024)
 
 #ifdef CONFIG_NETWORKING
 // If we have networking, we likely want errno comfort
