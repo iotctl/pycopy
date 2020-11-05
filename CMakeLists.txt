@@ -146,7 +146,6 @@ zephyr_library_sources(
 	# zephyr official port
 	ports/zephyr/help.c
 	ports/zephyr/modmachine.c
-	ports/zephyr/modusocket.c
 	ports/zephyr/moduos.c
 	ports/zephyr/modutime.c
 	ports/zephyr/zephyr_storage.c
@@ -156,6 +155,7 @@ zephyr_library_sources(
 	zephyr/src/zfs.c
 	zephyr/src/zfs_file.c
 	zephyr/src/modzephyr.c
+	zephyr/src/modusocket.c
 )
 
 get_property(ZEPHYR_INTERFACE_OPTIONS TARGET zephyr_interface PROPERTY INTERFACE_COMPILE_OPTIONS)
